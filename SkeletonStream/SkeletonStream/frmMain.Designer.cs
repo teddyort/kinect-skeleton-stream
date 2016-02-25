@@ -30,6 +30,7 @@
         {
             this.lblStatus = new System.Windows.Forms.Label();
             this.dgvTable = new System.Windows.Forms.DataGridView();
+            this.chkSeatedMode = new System.Windows.Forms.CheckBox();
             this.joint = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.orientation = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.dgvTable)).BeginInit();
@@ -38,7 +39,7 @@
             // lblStatus
             // 
             this.lblStatus.AutoSize = true;
-            this.lblStatus.Location = new System.Drawing.Point(12, 494);
+            this.lblStatus.Location = new System.Drawing.Point(9, 532);
             this.lblStatus.Name = "lblStatus";
             this.lblStatus.Size = new System.Drawing.Size(61, 13);
             this.lblStatus.TabIndex = 2;
@@ -54,16 +55,31 @@
             this.orientation});
             this.dgvTable.Location = new System.Drawing.Point(12, 12);
             this.dgvTable.Name = "dgvTable";
-            this.dgvTable.Size = new System.Drawing.Size(508, 446);
+            this.dgvTable.Size = new System.Drawing.Size(508, 494);
             this.dgvTable.TabIndex = 3;
+            // 
+            // chkSeatedMode
+            // 
+            this.chkSeatedMode.AutoSize = true;
+            this.chkSeatedMode.Checked = true;
+            this.chkSeatedMode.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkSeatedMode.Location = new System.Drawing.Point(12, 512);
+            this.chkSeatedMode.Name = "chkSeatedMode";
+            this.chkSeatedMode.Size = new System.Drawing.Size(90, 17);
+            this.chkSeatedMode.TabIndex = 4;
+            this.chkSeatedMode.Text = "Seated Mode";
+            this.chkSeatedMode.UseVisualStyleBackColor = true;
+            this.chkSeatedMode.CheckedChanged += new System.EventHandler(this.chkSeatedMode_CheckedChanged);
             // 
             // joint
             // 
+            this.joint.FillWeight = 76.14214F;
             this.joint.HeaderText = "Joint";
             this.joint.Name = "joint";
             // 
             // orientation
             // 
+            this.orientation.FillWeight = 123.8579F;
             this.orientation.HeaderText = "Orientation";
             this.orientation.Name = "orientation";
             // 
@@ -71,7 +87,8 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(532, 516);
+            this.ClientSize = new System.Drawing.Size(532, 554);
+            this.Controls.Add(this.chkSeatedMode);
             this.Controls.Add(this.dgvTable);
             this.Controls.Add(this.lblStatus);
             this.Name = "frmMain";
@@ -87,6 +104,7 @@
 
         private System.Windows.Forms.Label lblStatus;
         private System.Windows.Forms.DataGridView dgvTable;
+        private System.Windows.Forms.CheckBox chkSeatedMode;
         private System.Windows.Forms.DataGridViewTextBoxColumn joint;
         private System.Windows.Forms.DataGridViewTextBoxColumn orientation;
     }

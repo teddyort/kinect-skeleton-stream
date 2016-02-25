@@ -7,6 +7,7 @@ using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
+using System.Windows;
 using System.Windows.Forms;
 using Microsoft.Kinect;
 using Microsoft.Kinect.Toolkit;
@@ -17,6 +18,7 @@ namespace SkeletonStream
     {
         private KinectSensorChooser _chooser;
         private Bitmap _bitmap;
+        private KinectSensor _sensor;
 
         public frmMain()
         {
@@ -35,18 +37,23 @@ namespace SkeletonStream
             var old = e.OldSensor; 
             StopKinect(old); 
  
-            var newsensor = e.NewSensor; 
-            if (newsensor == null) 
+            _sensor = e.NewSensor; 
+            if (_sensor == null) 
             { 
                 return; 
-            } 
- 
-            newsensor.SkeletonStream.Enable();
-            newsensor.SkeletonFrameReady += SkeletonFrameReady;
+            }
+
+            if (chkSeatedMode.Checked)
+            {
+                _sensor.SkeletonStream.TrackingMode = SkeletonTrackingMode.Seated;
+            }
+
+            _sensor.SkeletonStream.Enable();
+            _sensor.SkeletonFrameReady += SkeletonFrameReady;
  
             try 
             { 
-                newsensor.Start(); 
+                _sensor.Start(); 
                 lblStatus.Text = "Kinect Started" + "\r"; 
             } 
             catch (System.IO.IOException) 
@@ -106,6 +113,21 @@ namespace SkeletonStream
         String Vector4ToString(Vector4 vec)
         {
             return "(" + vec.X + ", " + vec.Y + ", " + vec.Z + ", " + vec.W + ")";
+        }
+
+        private void chkSeatedMode_CheckedChanged(object sender, EventArgs e)
+        {
+            if (null != this._sensor)
+            {
+                if (this.chkSeatedMode.Checked)
+                {
+                    this._sensor.SkeletonStream.TrackingMode = SkeletonTrackingMode.Seated;
+                }
+                else
+                {
+                    this._sensor.SkeletonStream.TrackingMode = SkeletonTrackingMode.Default;
+                }
+            }
         }
     }
 }

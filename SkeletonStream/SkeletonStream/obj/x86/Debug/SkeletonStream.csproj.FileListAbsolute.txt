@@ -1,7 +1,0 @@
-E:\Google Drive\Computer\Documents\College\MIT\2015-2016\Fall 2015\Thesis\Kinect\kinect-skeleton-stream\SkeletonStream\SkeletonStream\bin\Debug\SkeletonStream.exe
-E:\Google Drive\Computer\Documents\College\MIT\2015-2016\Fall 2015\Thesis\Kinect\kinect-skeleton-stream\SkeletonStream\SkeletonStream\bin\Debug\SkeletonStream.pdb
-E:\Google Drive\Computer\Documents\College\MIT\2015-2016\Fall 2015\Thesis\Kinect\kinect-skeleton-stream\SkeletonStream\SkeletonStream\obj\x86\Debug\SkeletonStream.frmMain.resources
-E:\Google Drive\Computer\Documents\College\MIT\2015-2016\Fall 2015\Thesis\Kinect\kinect-skeleton-stream\SkeletonStream\SkeletonStream\obj\x86\Debug\SkeletonStream.Properties.Resources.resources
-E:\Google Drive\Computer\Documents\College\MIT\2015-2016\Fall 2015\Thesis\Kinect\kinect-skeleton-stream\SkeletonStream\SkeletonStream\obj\x86\Debug\SkeletonStream.csproj.GenerateResource.Cache
-E:\Google Drive\Computer\Documents\College\MIT\2015-2016\Fall 2015\Thesis\Kinect\kinect-skeleton-stream\SkeletonStream\SkeletonStream\obj\x86\Debug\SkeletonStream.exe
-E:\Google Drive\Computer\Documents\College\MIT\2015-2016\Fall 2015\Thesis\Kinect\kinect-skeleton-stream\SkeletonStream\SkeletonStream\obj\x86\Debug\SkeletonStream.pdb

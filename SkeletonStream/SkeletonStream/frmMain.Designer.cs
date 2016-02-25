@@ -28,46 +28,67 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.video = new System.Windows.Forms.PictureBox();
-            this.rtbMessages = new System.Windows.Forms.RichTextBox();
-            ((System.ComponentModel.ISupportInitialize)(this.video)).BeginInit();
+            this.lblStatus = new System.Windows.Forms.Label();
+            this.dgvTable = new System.Windows.Forms.DataGridView();
+            this.joint = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.orientation = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvTable)).BeginInit();
             this.SuspendLayout();
             // 
-            // video
+            // lblStatus
             // 
-            this.video.Location = new System.Drawing.Point(12, 12);
-            this.video.Name = "video";
-            this.video.Size = new System.Drawing.Size(508, 413);
-            this.video.TabIndex = 0;
-            this.video.TabStop = false;
+            this.lblStatus.AutoSize = true;
+            this.lblStatus.Location = new System.Drawing.Point(12, 494);
+            this.lblStatus.Name = "lblStatus";
+            this.lblStatus.Size = new System.Drawing.Size(61, 13);
+            this.lblStatus.TabIndex = 2;
+            this.lblStatus.Text = "Initializing...";
             // 
-            // rtbMessages
+            // dgvTable
             // 
-            this.rtbMessages.Location = new System.Drawing.Point(12, 431);
-            this.rtbMessages.Name = "rtbMessages";
-            this.rtbMessages.Size = new System.Drawing.Size(508, 73);
-            this.rtbMessages.TabIndex = 1;
-            this.rtbMessages.Text = "";
+            this.dgvTable.AllowUserToAddRows = false;
+            this.dgvTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvTable.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.joint,
+            this.orientation});
+            this.dgvTable.Location = new System.Drawing.Point(12, 12);
+            this.dgvTable.Name = "dgvTable";
+            this.dgvTable.Size = new System.Drawing.Size(508, 446);
+            this.dgvTable.TabIndex = 3;
+            // 
+            // joint
+            // 
+            this.joint.HeaderText = "Joint";
+            this.joint.Name = "joint";
+            // 
+            // orientation
+            // 
+            this.orientation.HeaderText = "Orientation";
+            this.orientation.Name = "orientation";
             // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(532, 516);
-            this.Controls.Add(this.rtbMessages);
-            this.Controls.Add(this.video);
+            this.Controls.Add(this.dgvTable);
+            this.Controls.Add(this.lblStatus);
             this.Name = "frmMain";
             this.Text = "Skeleton Stream";
             this.Load += new System.EventHandler(this.frmMain_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.video)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvTable)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
         #endregion
 
-        private System.Windows.Forms.PictureBox video;
-        private System.Windows.Forms.RichTextBox rtbMessages;
+        private System.Windows.Forms.Label lblStatus;
+        private System.Windows.Forms.DataGridView dgvTable;
+        private System.Windows.Forms.DataGridViewTextBoxColumn joint;
+        private System.Windows.Forms.DataGridViewTextBoxColumn orientation;
     }
 }
 

@@ -41,19 +41,17 @@ namespace SkeletonStream
                 return; 
             } 
  
-            newsensor.SkeletonStream.Enable(); 
-            newsensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30); 
-            newsensor.DepthStream.Enable(DepthImageFormat.Resolution640x480Fps30); 
-            newsensor.AllFramesReady += SensorAllFramesReady; 
+            newsensor.SkeletonStream.Enable();
+            newsensor.SkeletonFrameReady += SkeletonFrameReady;
  
             try 
             { 
                 newsensor.Start(); 
-                rtbMessages.Text = "Kinect Started" + "\r"; 
+                lblStatus.Text = "Kinect Started" + "\r"; 
             } 
             catch (System.IO.IOException) 
-            { 
-                rtbMessages.Text = "Kinect Not Started" + "\r"; 
+            {
+                lblStatus.Text = "Kinect Not Started" + "\r"; 
                 //maybe another app is using Kinect 
                 _chooser.TryResolveConflict(); 
             } 
@@ -71,46 +69,43 @@ namespace SkeletonStream
             } 
         }
 
-        void SensorAllFramesReady(object sender, AllFramesReadyEventArgs e)
+        void SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
         {
-            SensorDepthFrameReady(e);
-            video.Image = _bitmap;
-        }
+            Skeleton[] skeletons = new Skeleton[0];
 
-
-        void SensorDepthFrameReady(AllFramesReadyEventArgs e)
-        {
-            // if the window is displayed, show the depth buffer image 
-            if (WindowState != FormWindowState.Minimized)
+            using (SkeletonFrame skeletonFrame = e.OpenSkeletonFrame())
             {
-                using (var frame = e.OpenDepthImageFrame())
+                if (skeletonFrame != null)
                 {
-                    _bitmap = CreateBitMapFromDepthFrame(frame);
+                    skeletons = new Skeleton[skeletonFrame.SkeletonArrayLength];
+                    skeletonFrame.CopySkeletonDataTo(skeletons);
+                }
+            }
+
+            if (skeletons.Length != 0)
+            {
+                foreach (Skeleton skel in skeletons)
+                {
+                    if (skel.TrackingState == SkeletonTrackingState.Tracked)
+                    {
+                        this.OutputBonesAndJoints(skel);
+                    }
                 }
             }
         }
 
-
-        private Bitmap CreateBitMapFromDepthFrame(DepthImageFrame frame)
+        void OutputBonesAndJoints(Skeleton skel)
         {
-            if (frame != null)
+            dgvTable.Rows.Clear();
+            foreach (BoneOrientation bone in skel.BoneOrientations)
             {
-                var bitmapImage = new Bitmap(frame.Width, frame.Height, PixelFormat.Format16bppRgb565);
-                var g = Graphics.FromImage(bitmapImage);
-                g.Clear(Color.FromArgb(0, 34, 68));
-
-                //Copy the depth frame data onto the bitmap  
-                var _pixelData = new short[frame.PixelDataLength];
-                frame.CopyPixelDataTo(_pixelData);
-                BitmapData bmapdata = bitmapImage.LockBits(new Rectangle(0, 0, frame.Width,
-                 frame.Height), ImageLockMode.WriteOnly, bitmapImage.PixelFormat);
-                IntPtr ptr = bmapdata.Scan0;
-                Marshal.Copy(_pixelData, 0, ptr, frame.Width * frame.Height);
-                bitmapImage.UnlockBits(bmapdata);
-
-                return bitmapImage;
+                dgvTable.Rows.Add(new object[] {bone.EndJoint.ToString(), Vector4ToString(bone.AbsoluteRotation.Quaternion)});
             }
-            return null;
+        }
+
+        String Vector4ToString(Vector4 vec)
+        {
+            return "(" + vec.X + ", " + vec.Y + ", " + vec.Z + ", " + vec.W + ")";
         }
     }
 }

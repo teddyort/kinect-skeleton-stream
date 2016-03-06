@@ -5,6 +5,8 @@
 #include <string>
 #include <stdio.h>
 #include <ros.h>
+#include <tf/transform_broadcaster.h>
+#include <tf/tfMessage.h>
 #include <geometry_msgs/PoseArray.h>
 #include <windows.h>
 #include <NuiApi.h>
@@ -12,29 +14,61 @@
 using namespace std;
 using std::string;
 
+/*
+	TODO:
+	Make this a class
+	Make Kinect use the near mode or seated mode or both
+	Consider increasing the rosserial buffer size to allow more than 8 poses in a posearray
+*/
+
 int _tmain(int argc, _TCHAR * argv[])
 {
+	//Settings
+	char ip[] = "18.242.7.134";
+	char base_link[] = "map";
+
 	NuiInitialize(NUI_INITIALIZE_FLAG_USES_SKELETON);
 	NUI_SKELETON_FRAME ourframe;
 	NUI_SKELETON_BONE_ORIENTATION bone_orientations [NUI_SKELETON_POSITION_COUNT];
 
 	ros::NodeHandle nh;
-	char *ros_master = "18.242.7.134";
+	char *ros_master = ip;
 
 	printf("Connecting to server at %s\n", ros_master);
 	nh.initNode(ros_master);
 
-	printf("Advertising joint pose message\n");
-	geometry_msgs::PoseArray pose_msg;
-	ros::Publisher joint_pose_pub("joint_poses", &pose_msg);
-	nh.advertise(joint_pose_pub);
+	printf("Initializing the TF broadcaster\n");
+	tf::TransformBroadcaster tf_pub;
+	tf_pub.init(nh);
 
+	const int NUM_BONES = 8;
+	const int bones_to_send[NUM_BONES] = {
+		NUI_SKELETON_POSITION_HEAD,
+		NUI_SKELETON_POSITION_SHOULDER_LEFT,
+		NUI_SKELETON_POSITION_SHOULDER_RIGHT,
+		NUI_SKELETON_POSITION_ELBOW_LEFT,
+		NUI_SKELETON_POSITION_WRIST_LEFT,
+		//NUI_SKELETON_POSITION_HAND_LEFT,
+		NUI_SKELETON_POSITION_SHOULDER_RIGHT,
+		NUI_SKELETON_POSITION_ELBOW_RIGHT,
+		NUI_SKELETON_POSITION_WRIST_RIGHT,
+		//NUI_SKELETON_POSITION_HAND_RIGHT,
+	};
+	const string bones_to_send_names[NUM_BONES] = {
+		"NUI_SKELETON_POSITION_HEAD",
+		"NUI_SKELETON_POSITION_SHOULDER_LEFT",
+		"NUI_SKELETON_POSITION_SHOULDER_RIGHT",
+		"NUI_SKELETON_POSITION_ELBOW_LEFT",
+		"NUI_SKELETON_POSITION_WRIST_LEFT",
+		//"NUI_SKELETON_POSITION_HAND_LEFT",
+		"NUI_SKELETON_POSITION_SHOULDER_RIGHT",
+		"NUI_SKELETON_POSITION_ELBOW_RIGHT",
+		"NUI_SKELETON_POSITION_WRIST_RIGHT",
+		//"NUI_SKELETON_POSITION_HAND_RIGHT",
+	};
+	geometry_msgs::TransformStamped tf_joints;
 	printf("Go robot go!\n");
-	int seq = 0;
-	const int NUM_BONES = 6;
-	pose_msg.poses_length = NUM_BONES;
-	pose_msg.header.frame_id = "map";
-	geometry_msgs::Pose mypose [NUM_BONES];
+
 	while (1)
 	{
 		NuiSkeletonGetNextFrame(0, &ourframe); //Get a frame and stuff it into ourframe
@@ -46,18 +80,18 @@ int _tmain(int argc, _TCHAR * argv[])
 				NuiSkeletonCalculateBoneOrientations(&ourframe.SkeletonData[i], bone_orientations);
 				for (int j = 0; j < NUM_BONES; j++)
 				{
-					mypose[j].position.x = ourframe.SkeletonData[i].SkeletonPositions[j].x;
-					mypose[j].position.y = ourframe.SkeletonData[i].SkeletonPositions[j].y;
-					mypose[j].position.z = ourframe.SkeletonData[i].SkeletonPositions[j].z;
-					mypose[j].orientation.w = bone_orientations[j].hierarchicalRotation.rotationQuaternion.w;
-					mypose[j].orientation.x = bone_orientations[j].hierarchicalRotation.rotationQuaternion.x;
-					mypose[j].orientation.y = bone_orientations[j].hierarchicalRotation.rotationQuaternion.y;
-					mypose[j].orientation.z = bone_orientations[j].hierarchicalRotation.rotationQuaternion.z;
+					tf_joints.header.frame_id = base_link;
+					tf_joints.child_frame_id = bones_to_send_names[j].c_str();
+					tf_joints.transform.translation.x = ourframe.SkeletonData[i].SkeletonPositions[bones_to_send[j]].x;
+					tf_joints.transform.translation.y = ourframe.SkeletonData[i].SkeletonPositions[bones_to_send[j]].y;
+					tf_joints.transform.translation.z = ourframe.SkeletonData[i].SkeletonPositions[bones_to_send[j]].z;
+					tf_joints.transform.rotation.w = bone_orientations[bones_to_send[j]].hierarchicalRotation.rotationQuaternion.w;
+					tf_joints.transform.rotation.x = bone_orientations[bones_to_send[j]].hierarchicalRotation.rotationQuaternion.x;
+					tf_joints.transform.rotation.y = bone_orientations[bones_to_send[j]].hierarchicalRotation.rotationQuaternion.y;
+					tf_joints.transform.rotation.z = bone_orientations[bones_to_send[j]].hierarchicalRotation.rotationQuaternion.z;
+					tf_pub.sendTransform(tf_joints);
 				}
-
-				pose_msg.poses = mypose;
-				pose_msg.header.seq = seq++;
-				joint_pose_pub.publish(&pose_msg);
+				
 			}
 		}
 

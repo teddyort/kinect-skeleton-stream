@@ -25,7 +25,7 @@ int _tmain(int argc, _TCHAR * argv[])
 {
 	//Settings
 	char ip[] = "18.242.7.134";
-	char base_link[] = "map";
+	char base_link[] = "skeleton_frame";
 
 	NuiInitialize(NUI_INITIALIZE_FLAG_USES_SKELETON);
 	NUI_SKELETON_FRAME ourframe;
@@ -43,9 +43,9 @@ int _tmain(int argc, _TCHAR * argv[])
 
 	const int NUM_BONES = 8;
 	const int bones_to_send[NUM_BONES] = {
+		NUI_SKELETON_POSITION_SHOULDER_CENTER,
 		NUI_SKELETON_POSITION_HEAD,
 		NUI_SKELETON_POSITION_SHOULDER_LEFT,
-		NUI_SKELETON_POSITION_SHOULDER_RIGHT,
 		NUI_SKELETON_POSITION_ELBOW_LEFT,
 		NUI_SKELETON_POSITION_WRIST_LEFT,
 		//NUI_SKELETON_POSITION_HAND_LEFT,
@@ -55,9 +55,9 @@ int _tmain(int argc, _TCHAR * argv[])
 		//NUI_SKELETON_POSITION_HAND_RIGHT,
 	};
 	const string bones_to_send_names[NUM_BONES] = {
+		"NUI_SKELETON_POSITION_SHOULDER_CENTER",
 		"NUI_SKELETON_POSITION_HEAD",
 		"NUI_SKELETON_POSITION_SHOULDER_LEFT",
-		"NUI_SKELETON_POSITION_SHOULDER_RIGHT",
 		"NUI_SKELETON_POSITION_ELBOW_LEFT",
 		"NUI_SKELETON_POSITION_WRIST_LEFT",
 		//"NUI_SKELETON_POSITION_HAND_LEFT",
@@ -80,6 +80,7 @@ int _tmain(int argc, _TCHAR * argv[])
 				NuiSkeletonCalculateBoneOrientations(&ourframe.SkeletonData[i], bone_orientations);
 				for (int j = 0; j < NUM_BONES; j++)
 				{
+					tf_joints.header.stamp = nh.now();
 					tf_joints.header.frame_id = base_link;
 					tf_joints.child_frame_id = bones_to_send_names[j].c_str();
 					tf_joints.transform.translation.x = ourframe.SkeletonData[i].SkeletonPositions[bones_to_send[j]].x;

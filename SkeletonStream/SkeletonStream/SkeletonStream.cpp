@@ -16,9 +16,8 @@ using std::string;
 
 /*
 	TODO:
-	Make this a class
+	Make this a class and breakout to functions
 	Make Kinect use the near mode or seated mode or both
-	Consider increasing the rosserial buffer size to allow more than 8 poses in a posearray
 */
 
 int _tmain(int argc, _TCHAR * argv[])
@@ -27,9 +26,20 @@ int _tmain(int argc, _TCHAR * argv[])
 	char ip[] = "18.242.7.134";
 	char base_link[] = "skeleton_frame";
 
-	NuiInitialize(NUI_INITIALIZE_FLAG_USES_SKELETON);
+	//Initialize Kinect
+	int sensorCount = 0;
+	INuiSensor* sensor;
 	NUI_SKELETON_FRAME ourframe;
-	NUI_SKELETON_BONE_ORIENTATION bone_orientations [NUI_SKELETON_POSITION_COUNT];
+	NUI_SKELETON_BONE_ORIENTATION bone_orientations[NUI_SKELETON_POSITION_COUNT];
+	
+	while (sensorCount < 1)
+	{
+		NuiGetSensorCount(&sensorCount);
+		printf("Waiting for kinect... Current sensor count: %s\n", to_string(sensorCount).c_str());
+	}
+	NuiCreateSensorByIndex(0, &sensor);
+	sensor->NuiInitialize(NUI_INITIALIZE_FLAG_USES_SKELETON);
+	sensor->NuiSkeletonTrackingEnable(NULL, NUI_SKELETON_TRACKING_FLAG_ENABLE_SEATED_SUPPORT);
 
 	ros::NodeHandle nh;
 	char *ros_master = ip;
@@ -55,15 +65,15 @@ int _tmain(int argc, _TCHAR * argv[])
 		//NUI_SKELETON_POSITION_HAND_RIGHT,
 	};
 	const string bones_to_send_names[NUM_BONES] = {
-		"NUI_SKELETON_POSITION_SHOULDER_CENTER",
-		"NUI_SKELETON_POSITION_HEAD",
-		"NUI_SKELETON_POSITION_SHOULDER_LEFT",
-		"NUI_SKELETON_POSITION_ELBOW_LEFT",
-		"NUI_SKELETON_POSITION_WRIST_LEFT",
+		"shoulder_center",
+		"head",
+		"shoulder_left",
+		"elbow_left",
+		"wrist_left",
 		//"NUI_SKELETON_POSITION_HAND_LEFT",
-		"NUI_SKELETON_POSITION_SHOULDER_RIGHT",
-		"NUI_SKELETON_POSITION_ELBOW_RIGHT",
-		"NUI_SKELETON_POSITION_WRIST_RIGHT",
+		"shoulder_right",
+		"elbow_right",
+		"wrist_right",
 		//"NUI_SKELETON_POSITION_HAND_RIGHT",
 	};
 	geometry_msgs::TransformStamped tf_joints;
@@ -71,7 +81,7 @@ int _tmain(int argc, _TCHAR * argv[])
 
 	while (1)
 	{
-		NuiSkeletonGetNextFrame(0, &ourframe); //Get a frame and stuff it into ourframe
+		sensor->NuiSkeletonGetNextFrame(0, &ourframe); //Get a frame and stuff it into ourframe
 		for (int i = 0; i < NUI_SKELETON_COUNT; i++) //Loop over the 6 possible skeletons
 		{
 			if (ourframe.SkeletonData[i].eTrackingState == NUI_SKELETON_TRACKED)
@@ -86,10 +96,10 @@ int _tmain(int argc, _TCHAR * argv[])
 					tf_joints.transform.translation.x = ourframe.SkeletonData[i].SkeletonPositions[bones_to_send[j]].x;
 					tf_joints.transform.translation.y = ourframe.SkeletonData[i].SkeletonPositions[bones_to_send[j]].y;
 					tf_joints.transform.translation.z = ourframe.SkeletonData[i].SkeletonPositions[bones_to_send[j]].z;
-					tf_joints.transform.rotation.w = bone_orientations[bones_to_send[j]].hierarchicalRotation.rotationQuaternion.w;
-					tf_joints.transform.rotation.x = bone_orientations[bones_to_send[j]].hierarchicalRotation.rotationQuaternion.x;
-					tf_joints.transform.rotation.y = bone_orientations[bones_to_send[j]].hierarchicalRotation.rotationQuaternion.y;
-					tf_joints.transform.rotation.z = bone_orientations[bones_to_send[j]].hierarchicalRotation.rotationQuaternion.z;
+					tf_joints.transform.rotation.w = bone_orientations[bones_to_send[j]].absoluteRotation.rotationQuaternion.w;
+					tf_joints.transform.rotation.x = bone_orientations[bones_to_send[j]].absoluteRotation.rotationQuaternion.x;
+					tf_joints.transform.rotation.y = bone_orientations[bones_to_send[j]].absoluteRotation.rotationQuaternion.y;
+					tf_joints.transform.rotation.z = bone_orientations[bones_to_send[j]].absoluteRotation.rotationQuaternion.z;
 					tf_pub.sendTransform(tf_joints);
 				}
 				
